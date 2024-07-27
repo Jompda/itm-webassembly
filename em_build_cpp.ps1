@@ -19,7 +19,7 @@
 md -Force .\em_bin\
 
 # nodejs / js
-#em++ $(ls .\src\*.cpp | % {$_.FullName}) -o .\em_bin\.\itm.js -fdeclspec -s EXPORTED_FUNCTIONS="['_malloc','_free','_EMSCRIPTEN_ITM_P2P_TLS_Ex_str']" -s EXPORTED_RUNTIME_METHODS='cwrap,ccall,setValue,getValue'
+em++ $(ls .\src\*.cpp | % {$_.FullName}) -o .\em_bin\.\itm.js -fdeclspec -s EXPORTED_FUNCTIONS="['_malloc','_free','_EMSCRIPTEN_ITM_P2P_TLS_Ex_str']" -s EXPORTED_RUNTIME_METHODS='cwrap,ccall,setValue,getValue'
 
 # nodejs / module
-em++ $(ls .\src\*.cpp | % {$_.FullName}) -o .\em_bin\.\itm.mjs -fdeclspec -s EXPORTED_FUNCTIONS="['_malloc','_free','_EMSCRIPTEN_ITM_P2P_TLS_Ex_str','_EMSCRIPTEN_ITM_P2P_CR_Ex_str']" -s EXPORTED_RUNTIME_METHODS='cwrap,ccall,setValue,getValue'
+#em++ $(ls .\src\*.cpp | % {$_.FullName}) -o .\em_bin\.\itm.mjs -fdeclspec -s EXPORTED_FUNCTIONS="['_malloc','_free','_EMSCRIPTEN_ITM_P2P_TLS_Ex_str','_EMSCRIPTEN_ITM_P2P_CR_Ex_str']" -s EXPORTED_RUNTIME_METHODS='cwrap,ccall,setValue,getValue'

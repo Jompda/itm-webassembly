@@ -21,41 +21,41 @@ const EMSCRIPTEN_ITM_P2P_TLS_Ex_str = Module.cwrap('EMSCRIPTEN_ITM_P2P_TLS_Ex_st
     'number', // double *A__db
     'number', // long *warnings
     'number'  // IntermediateValues *interValues
-    ])
-    console.log('Wrapper for EMSCRIPTEN_ITM_P2P_TLS_Ex_str created.')
+])
+console.log('Wrapper for EMSCRIPTEN_ITM_P2P_TLS_Ex_str created.')
 
 
-    /*
-    struct IntermediateValues
-    {
-        double theta_hzn[2];        // Terminal horizon angles
-        double d_hzn__meter[2];     // Terminal horizon distances, in meters
-        double h_e__meter[2];       // Terminal effective heights, in meters
-        double N_s;                 // Surface refractivity, in N-Units
-        double delta_h__meter;      // Terrain irregularity parameter, in meters
-        double A_ref__db;           // Reference attenuation, in dB
-        double A_fs__db;            // Free space basic transmission loss, in dB
-        double d__km;               // Path distance, in km
-        int mode;                   // Mode of propagation value
-    };
-    */
+/*
+struct IntermediateValues
+{
+    double theta_hzn[2];        // Terminal horizon angles
+    double d_hzn__meter[2];     // Terminal horizon distances, in meters
+    double h_e__meter[2];       // Terminal effective heights, in meters
+    double N_s;                 // Surface refractivity, in N-Units
+    double delta_h__meter;      // Terrain irregularity parameter, in meters
+    double A_ref__db;           // Reference attenuation, in dB
+    double A_fs__db;            // Free space basic transmission loss, in dB
+    double d__km;               // Path distance, in km
+    int mode;                   // Mode of propagation value
+};
+*/
 
-    /* Example TLS options
-    h_tx__meter,15
-    h_rx__meter,3
-    climate,5
-    N_0,301
-    f__mhz,3500
-    pol,1
-    epsilon,15
-    sigma,0.005
-    mdvar,1
-    time,50
-    location,50
-    situation,50
-    */
+/* Example TLS options
+h_tx__meter,15
+h_rx__meter,3
+climate,5
+N_0,301
+f__mhz,3500
+pol,1
+epsilon,15
+sigma,0.005
+mdvar,1
+time,50
+location,50
+situation,50
+*/
 
-    Module.onRuntimeInitialized = () => {
+Module.onRuntimeInitialized = () => {
     console.log('Runtime initialized, initializing variables..')
 
     // https://stackoverflow.com/questions/71681491/passing-arrays-and-objects-from-javascript-to-c-in-web-assembly

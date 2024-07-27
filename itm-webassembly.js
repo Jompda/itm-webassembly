@@ -1,12 +1,13 @@
-import EM_Module from '../em_bin/itm.mjs'
 
 let em_runtime
 let ITM_P2P_TLS_Ex_func
 let ITM_P2P_CR_Ex_func
-let onInitializeFunc
+let onItmInitializeFunc
 
-export function onInitialize(callback) {
-    onInitializeFunc = callback
+
+window.onItmInitialize = function (callback) {
+    onItmInitializeFunc = callback
+    if (em_runtime) callback()
 }
 
 // Size needed to allocate to struct IntermediateValues
@@ -21,11 +22,12 @@ const intermediate_values_length =
     + 8 // double d__km
     + 4 // int mode
 
-EM_Module().then((runtime) => {
-    em_runtime = runtime
+// Might need to change to Module all runtime references
+Module.onRuntimeInitialized = () => {
+    em_runtime = Module
 
     // Prepare wrappers for the C functions.
-    ITM_P2P_TLS_Ex_func = runtime.cwrap('EMSCRIPTEN_ITM_P2P_TLS_Ex_str', 'string', [
+    ITM_P2P_TLS_Ex_func = em_runtime.cwrap('EMSCRIPTEN_ITM_P2P_TLS_Ex_str', 'string', [
         'number', // double h_tx__meter
         'number', // double h_rx__meter
         'number', // double *pfl[]
@@ -43,7 +45,7 @@ EM_Module().then((runtime) => {
         'number', // long *warnings
         'number'  // IntermediateValues *interValues
     ])
-    ITM_P2P_CR_Ex_func = runtime.cwrap('EMSCRIPTEN_ITM_P2P_CR_Ex_str', 'string', [
+    ITM_P2P_CR_Ex_func = em_runtime.cwrap('EMSCRIPTEN_ITM_P2P_CR_Ex_str', 'string', [
         'number', // double h_tx__meter
         'number', // double h_rx__meter
         'number', // double *pfl[]
@@ -62,11 +64,11 @@ EM_Module().then((runtime) => {
     ])
     // TODO: Area functions
 
-    onInitializeFunc()
-})
+    if (onItmInitializeFunc) onItmInitializeFunc()
+}
 
 
-export function ITM_P2P_TLS_Ex(
+window.ITM_P2P_TLS_Ex = function ITM_P2P_TLS_Ex(
     h_tx__meter, h_rx__meter, pfl, climate, N_0, f__mhz, pol,
     epsilon, sigma, mdvar, time, location, situation
 ) {
@@ -104,7 +106,7 @@ export function ITM_P2P_TLS_Ex(
     return results
 }
 
-export function ITM_P2P_CR_Ex(
+window.ITM_P2P_CR_Ex = function ITM_P2P_CR_Ex(
     h_tx__meter, h_rx__meter, pfl, climate, N_0, f__mhz, pol,
     epsilon, sigma, mdvar, confidence, reliability
 ) {
