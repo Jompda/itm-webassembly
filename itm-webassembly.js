@@ -9,6 +9,7 @@ export function onInitialize(callback) {
     onInitializeFunc = callback
 }
 
+// Size needed to allocate to struct IntermediateValues
 const intermediate_values_length =
     8 * 2 // double theta_hzn[2]
     + 8 * 2 // double d_hzn__meter[2]
@@ -70,16 +71,8 @@ export function ITM_P2P_TLS_Ex(
     epsilon, sigma, mdvar, time, location, situation
 ) {
     if (!em_runtime) throw "Emscripten runtime not initialzed yet!"
-    // TODO: external functions for memory allocation and freeing
-    // Allocate space for variables
-    const typedPfl = new Float64Array(pfl)
-    const ptr_pfl = em_runtime._malloc(typedPfl.length * typedPfl.BYTES_PER_ELEMENT)
-    em_runtime.HEAPF64.set(typedPfl, ptr_pfl / 8);
-    
-    const ptr_A__db = em_runtime._malloc(8) // double
-    const ptr_warnings = em_runtime._malloc(8) // long
 
-    const ptr_intermediate_values = em_runtime._malloc(intermediate_values_length)
+    const { ptr_pfl, ptr_A__db, ptr_warnings, ptr_intermediate_values } = p2p_allocate(pfl)
 
     // A string containing key:value pairs separated by |
     const resultStr = ITM_P2P_TLS_Ex_func(
@@ -106,10 +99,7 @@ export function ITM_P2P_TLS_Ex(
         results.set(parts[0], parts[1])
     }
 
-    em_runtime._free(ptr_pfl)
-    em_runtime._free(ptr_A__db)
-    em_runtime._free(ptr_warnings)
-    em_runtime._free(ptr_intermediate_values)
+    p2p_free(ptr_pfl, ptr_A__db, ptr_warnings, ptr_intermediate_values)
 
     return results
 }
@@ -119,15 +109,8 @@ export function ITM_P2P_CR_Ex(
     epsilon, sigma, mdvar, confidence, reliability
 ) {
     if (!em_runtime) throw "Emscripten runtime not initialzed yet!"
-    // Allocate space for variables
-    const typedPfl = new Float64Array(pfl)
-    const ptr_pfl = em_runtime._malloc(typedPfl.length * typedPfl.BYTES_PER_ELEMENT)
-    em_runtime.HEAPF64.set(typedPfl, ptr_pfl / 8);
-    
-    const ptr_A__db = em_runtime._malloc(8) // double
-    const ptr_warnings = em_runtime._malloc(8) // long
 
-    const ptr_intermediate_values = em_runtime._malloc(intermediate_values_length)
+    const { ptr_pfl, ptr_A__db, ptr_warnings, ptr_intermediate_values } = p2p_allocate(pfl)
 
     // A string containing key:value pairs separated by |
     const resultStr = ITM_P2P_CR_Ex_func(
@@ -153,10 +136,29 @@ export function ITM_P2P_CR_Ex(
         results.set(parts[0], parts[1])
     }
 
+    p2p_free(ptr_pfl, ptr_A__db, ptr_warnings, ptr_intermediate_values)
+
+    return results
+}
+
+
+function p2p_allocate(pfl) {
+    const typedPfl = new Float64Array(pfl)
+    const ptr_pfl = em_runtime._malloc(typedPfl.length * typedPfl.BYTES_PER_ELEMENT)
+    em_runtime.HEAPF64.set(typedPfl, ptr_pfl / 8);
+    
+    const ptr_A__db = em_runtime._malloc(8) // double
+    const ptr_warnings = em_runtime._malloc(8) // long
+
+    const ptr_intermediate_values = em_runtime._malloc(intermediate_values_length)
+    return {
+        ptr_pfl, ptr_A__db, ptr_warnings, ptr_intermediate_values
+    }
+}
+
+function p2p_free(ptr_pfl, ptr_A__db, ptr_warnings, ptr_intermediate_values) {
     em_runtime._free(ptr_pfl)
     em_runtime._free(ptr_A__db)
     em_runtime._free(ptr_warnings)
     em_runtime._free(ptr_intermediate_values)
-
-    return results
 }

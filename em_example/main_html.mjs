@@ -1,4 +1,4 @@
-import { onInitialize, ITM_P2P_TLS_Ex } from '../itm.js'
+import { onInitialize, ITM_P2P_TLS_Ex } from '../itm-webassembly.js'
 
 console.log('module loaded, waiting for initialize..')
 

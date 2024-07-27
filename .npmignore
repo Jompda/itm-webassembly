@@ -5,4 +5,5 @@ src/
 win32/
 *.csv
 cmdREADME.md
+em_example/
 em_build_cpp.*
