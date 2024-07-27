@@ -10,8 +10,8 @@ If you want the module (.mjs) file, you need to uncomment the line in the `em_bu
 Note, I'm not experienced with compiling C programs.
 
 ## NPM Module ##
-TODO: Must be usable as a ES6 module in addition to regular JavaScript.
-      Include TypeSript definitions.
+
+Contains entrypoint `itm-webassembly.js` as a ES6 module with type definitions in `itm-webassembly.d.ts` and associated "binaries" compiled using Emscripten. The module exposes two of the itm project's main functions: `ITM_P2P_TLS_Ex` and `ITM_P2P_CR_Ex` using `EMSCRIPTEN_ITM_P2P_TLS_Ex_str` and `EMSCRIPTEN_ITM_P2P_CR_Ex_str`. The reason for these additional functions is because I was having issues reading from the struct IntermediateValues. Area functions might be exported if I need them.
 
 # ITS Irregular Terrain Model (ITM) #
 
