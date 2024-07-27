@@ -52,6 +52,11 @@ Desktop.ini
 *.d
 
 
+################
+# Emscripten
+###############
+em_bin/
+
 # Created by https://www.gitignore.io
 
 ### Xcode ###

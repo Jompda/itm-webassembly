@@ -250,3 +250,34 @@ int ITM_P2P_TLS_Ex(double h_tx__meter, double h_rx__meter, double pfl[], int cli
 
     return SUCCESS;
 };
+
+const char* EMSCRIPTEN_ITM_P2P_TLS_Ex_str(double h_tx__meter, double h_rx__meter, double pfl[], int climate, double N_0, double f__mhz,
+    int pol, double epsilon, double sigma, int mdvar, double time, double location, double situation,
+    double* A__db, long* warnings, IntermediateValues* interValues)
+{
+    int rtn = ITM_P2P_TLS_Ex(h_tx__meter, h_rx__meter, pfl, climate, N_0, f__mhz, pol, epsilon, sigma, mdvar,
+        time, location, situation, A__db, warnings, interValues);
+
+    return resultsToStr(A__db, warnings, interValues, rtn);
+}
+
+const char* resultsToStr(double* A__db, long* warnings, IntermediateValues* interValues, int rtn)
+{
+    stringstream strs;
+    strs << "A_ref__db:" << interValues->A_ref__db << '|';
+    strs << "A_fs__db:" << interValues->A_fs__db << '|';
+    strs << "delta_h__meter:" << interValues->delta_h__meter << '|';
+    strs << "d_hzn__meter:" << interValues->d_hzn__meter[0] << '|';
+    strs << "d_hzn__meter:" << interValues->d_hzn__meter[1] << '|';
+    strs << "h_e__meter:" << interValues->h_e__meter[0] << '|';
+    strs << "h_e__meter:" << interValues->h_e__meter[1] << '|';
+    strs << "N_s:" << interValues->N_s << '|';
+    strs << "theta_hzn:" << interValues->theta_hzn[0] << '|';
+    strs << "theta_hzn:" << interValues->theta_hzn[1] << '|';
+    strs << "mode:" << interValues->mode << '|';
+    strs << "A__db:" << *A__db << '|';
+    strs << "warnings:" << bitset<64>(*warnings) << '|';
+    strs << "code:" << rtn;
+
+    return strs.str().c_str();
+}

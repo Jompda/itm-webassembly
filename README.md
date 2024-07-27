@@ -1,3 +1,18 @@
+# Notes by Joni Rapo 2024 #
+My aim is to compile the ITM project into WebAssemply using Emscripten.
+
+## Emscripten Compilation ##
+
+1. Install and activate emscripten by following the instructions from [Emscripten download](https://emscripten.org/docs/getting_started/downloads.html).
+
+2. Run `em_build_cpp` (.ps1) (TODO: .bat & .sh). You should now have `emscripten.js` and `emscripten.wasm` in the working directory.
+If you want the module (.mjs) file, you need to uncomment the line in the `em_build_cpp` file.
+Note, I'm not experienced with compiling C programs.
+
+## NPM module ##
+TODO: Must be usable as a ES6 module in addition to regular JavaScript.
+      Include TypeSript definitions.
+
 # ITS Irregular Terrain Model (ITM) #
 
 This code repository contains the ITS Irregular Terrain Model (ITM). ITM predicts terrestrial radiowave propagation for frequencies between 20 MHz and 20 GHz based on electromagnetic theory and empirical models developed by Anita Longley and Phil Rice. Propagation mechanisms considered include free space loss, diffraction, and troposcatter. Specifically, ITM predicts attenuation as a function of distance (greater than 1 km), terminal heights, meteorological conditions, terrain effects, and the variability of the signal in time and in space.
