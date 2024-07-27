@@ -251,6 +251,16 @@ int ITM_P2P_TLS_Ex(double h_tx__meter, double h_rx__meter, double pfl[], int cli
     return SUCCESS;
 };
 
+const char* EMSCRIPTEN_ITM_P2P_CR_Ex_str(double h_tx__meter, double h_rx__meter, double pfl[], int climate, double N_0, double f__mhz,
+    int pol, double epsilon, double sigma, int mdvar, double confidence, double reliability,
+    double* A__db, long* warnings, IntermediateValues* interValues)
+{
+    int rtn = ITM_P2P_CR_Ex(h_tx__meter, h_rx__meter, pfl, climate, N_0, f__mhz, pol, epsilon, sigma, mdvar,
+        confidence, reliability, A__db, warnings, interValues);
+
+    return resultsToStr(A__db, warnings, interValues, rtn);
+}
+
 const char* EMSCRIPTEN_ITM_P2P_TLS_Ex_str(double h_tx__meter, double h_rx__meter, double pfl[], int climate, double N_0, double f__mhz,
     int pol, double epsilon, double sigma, int mdvar, double time, double location, double situation,
     double* A__db, long* warnings, IntermediateValues* interValues)

@@ -1,4 +1,4 @@
-const Module = require('../em_bin/emscripten.js')
+const Module = require('../em_bin/itm.js')
 
 
 /**

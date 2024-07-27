@@ -1,0 +1,8 @@
+cmd_examples/
+dotnet/
+include/
+src/
+win32/
+*.csv
+cmdREADME.md
+em_build_cpp.*

@@ -1,0 +1,16 @@
+{
+  "name": "itm-webassembly",
+  "version": "1.0.0",
+  "description": "The Irregular Terrain Model (ITM) into WebAssembly",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jompda/itm-webassembly.git"
+  },
+  "author": "Joni Rapo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Jompda/itm-webassembly/issues"
+  },
+  "homepage": "https://github.com/Jompda/itm-webassembly#readme"
+}

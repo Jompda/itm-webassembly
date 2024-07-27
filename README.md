@@ -9,7 +9,7 @@ My aim is to compile the ITM project into WebAssemply using Emscripten.
 If you want the module (.mjs) file, you need to uncomment the line in the `em_build_cpp` file.
 Note, I'm not experienced with compiling C programs.
 
-## NPM module ##
+## NPM Module ##
 TODO: Must be usable as a ES6 module in addition to regular JavaScript.
       Include TypeSript definitions.
 
