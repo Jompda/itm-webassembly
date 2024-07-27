@@ -21,7 +21,7 @@ declare module 'itm-webassembly' {
         h_tx__meter: number, h_rx__meter: number, pfl: Array<number>, climate: number,
         N_0: number, f__mhz: number, pol: number, epsilon: number, sigma: number,
         mdvar: number, time: number, location: number, situation: number
-    ): Map<string,string>
+    ): Map<string, string>
 
     /**
      * @param h_tx__meter double h_tx__meter
@@ -41,5 +41,5 @@ declare module 'itm-webassembly' {
         h_tx__meter: number, h_rx__meter: number, pfl: Array<number>, climate: number,
         N_0: number, f__mhz: number, pol: number, epsilon: number, sigma: number,
         mdvar: number, confidence: number, reliability: number
-    ): Map<string,string>
+    ): Map<string, string>
 }
