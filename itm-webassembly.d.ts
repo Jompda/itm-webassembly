@@ -42,4 +42,7 @@ declare module 'itm-webassembly' {
         N_0: number, f__mhz: number, pol: number, epsilon: number, sigma: number,
         mdvar: number, confidence: number, reliability: number
     ): Map<string, string>
+
+    export function resolveReturnCode(code: number): string
+    export function resolveWarnings(warnings: string): Array<string>
 }

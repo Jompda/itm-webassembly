@@ -1,4 +1,50 @@
 
+
+const returnCodes = new Map([
+    [0, 'Successful execution'],
+    [1, 'Successful execution, but warning flags set'],
+    [1000, 'TX terminal height is out of range'],
+    [1001, 'RX terminal height is out of range'],
+    [1002, 'Invalid value for radio climate'],
+    [1003, 'Time percentage is out of range'],
+    [1004, 'Location percentage is out of range'],
+    [1005, 'Situation percentage is out of range'],
+    [1006, 'Confidence percentage is out of range'],
+    [1007, 'Reliability percentage is out of range'],
+    [1008, 'Refractivity is out of range'],
+    [1009, 'Frequency is out of range'],
+    [1010, 'Invalid value for polarization'],
+    [1011, 'Epsilon is out of range'],
+    [1012, 'Sigma is out of range'],
+    [1013, 'The imaginary portion of the complex impedance is larger than the real portion'],
+    [1014, 'Invalid value for mode of variability'],
+    [1016, 'Internally computed effective earth radius is invalid'],
+    [1017, 'Path distance is out of range'],
+    [1018, 'Delta H (terrain irregularity parameter) is out of range'],
+    [1019, 'Invalid value for TX siting criteria'],
+    [1020, 'Invalid value for RX siting criteria'],
+    [1021, 'Internally computed surface refractivity value is too small'],
+    [1022, 'Internally computed surface refractivity value is too large'],
+])
+const warningBits = new Map([
+    [0, 'TX terminal height is near its limits'],
+    [1, 'RX terminal height is near its limits'],
+    [2, 'Frequency is near its limits'],
+    [3, 'Path distance is near its upper limit'],
+    [4, 'Path distance is large - care must be taken with result'],
+    [5, 'Path distance is near its lower limit'],
+    [6, 'Path distance is small - care must be taken with result'],
+    [7, 'TX horizon angle is large - small angle approximations could break down'],
+    [8, 'RX horizon angle is large - small angle approximations could break down'],
+    [9, 'TX horizon distance is less than 1/10 of the smooth earth horizon distance'],
+    [10, 'RX horizon distance is less than 1/10 of the smooth earth horizon distance'],
+    [11, 'TX horizon distance is greater than 3 times the smooth earth horizon distance'],
+    [12, 'RX horizon distance is greater than 3 times the smooth earth horizon distance'],
+    [13, 'One of the provided variabilities is located far in the tail of its distribution'],
+    [14, 'Internally computed surface refractivity value is small - care must be taken with result'],
+])
+
+
 let em_runtime
 let ITM_P2P_TLS_Ex_func
 let ITM_P2P_CR_Ex_func
@@ -164,3 +210,18 @@ function p2p_free(ptr_pfl, ptr_A__db, ptr_warnings, ptr_intermediate_values) {
     em_runtime._free(ptr_warnings)
     em_runtime._free(ptr_intermediate_values)
 }
+
+
+function resolveReturnCode(code) {
+    return returnCodes.get(code)
+}
+window.resolveReturnCode = resolveReturnCode
+
+function resolveWarnings(warnings) {
+    const arr = []
+    for (let i = warnings.length - 1, j = 0; i >= 0; --i, ++j)
+        if (warnings[i] == '1') arr.push(warningBits.get(j))
+    if (arr.length == 0) arr.push('No warning flags')
+    return arr
+}
+window.resolveWarnings = resolveWarnings

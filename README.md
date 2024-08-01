@@ -5,13 +5,17 @@ My aim is to compile the ITM project into WebAssemply using Emscripten.
 
 1. Install and activate emscripten by following the instructions from [Emscripten download](https://emscripten.org/docs/getting_started/downloads.html).
 
-2. Run `em_build_cpp` (.ps1) (TODO: .bat & .sh). You should now have `emscripten.js` and `emscripten.wasm` in the working directory.
-If you want the module (.mjs) file, you need to uncomment the line in the `em_build_cpp` file.
-Note, I'm not experienced with compiling C programs.
+2. Run `em_build_cpp` (.ps1) (TODO: .bat & .sh). You should now have `emscripten.js` and `emscripten.wasm` in the working directory. If you want the module (.mjs) file, you need to uncomment the line in the `em_build_cpp` file. Note, I'm not experienced with compiling C programs.
 
 ## NPM Module ##
 
-Contains entrypoint `itm-webassembly.js` ~~as a ES6 module~~ with type definitions in `itm-webassembly.d.ts` and associated "binaries" compiled using Emscripten. The module exposes two of the itm project's main functions: `ITM_P2P_TLS_Ex` and `ITM_P2P_CR_Ex` using `EMSCRIPTEN_ITM_P2P_TLS_Ex_str` and `EMSCRIPTEN_ITM_P2P_CR_Ex_str`. The reason for these additional functions is because I was having issues reading from the struct IntermediateValues. Area functions might be exported if I need them.
+Contains entrypoint `itm-webassembly.js` ~~as a ES6 module~~ and associated "binaries" in `em_bin/` compiled using Emscripten. The module exposes two of the itm project's main functions: `ITM_P2P_TLS_Ex` and `ITM_P2P_CR_Ex` using `EMSCRIPTEN_ITM_P2P_TLS_Ex_str` and `EMSCRIPTEN_ITM_P2P_CR_Ex_str`. The reason for these additional functions is because I was having issues reading from the struct IntermediateValues.
+
+### Future Plans ###
+
+- Instead of allocating and freeing memory on every function call, allocate the needed memory when `onRuntimeInitialized` is called and free it when `atexit` or `onExit` is called (that is, if they get called whenever the page closes).
+- Export area functions.
+- Proper support for exports. Might need to transpile using babel or something.
 
 # ITS Irregular Terrain Model (ITM) #
 
