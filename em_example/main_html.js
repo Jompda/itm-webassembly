@@ -1,29 +1,5 @@
 
-/**
- * int EMSCRIPTEN_ITM_P2P_TLS_Ex_str(double h_tx__meter, double h_rx__meter, double *pfl[], int climate, double N_0, double f__mhz,
- *   int pol, double epsilon, double sigma, int mdvar, double time, double location, double situation,
- *   double *A__db, long *warnings, IntermediateValues *interValues);
- */
-const EMSCRIPTEN_ITM_P2P_TLS_Ex_str = Module.cwrap('EMSCRIPTEN_ITM_P2P_TLS_Ex_str', 'string', [
-    'number', // double h_tx__meter
-    'number', // double h_rx__meter
-    'number', // double *pfl[]
-    'number', // int climate
-    'number', // double N_0
-    'number', // double f__mhz
-    'number', // int pol
-    'number', // double epsilon
-    'number', // double sigma
-    'number', // int mdvar
-    'number', // double time
-    'number', // double location
-    'number', // double situation
-    'number', // double *A__db
-    'number', // long *warnings
-    'number'  // IntermediateValues *interValues
-])
-console.log('Wrapper for EMSCRIPTEN_ITM_P2P_TLS_Ex_str created.')
-
+Module().then(onModuleInitialize)
 
 /*
 struct IntermediateValues
@@ -55,18 +31,45 @@ location,50
 situation,50
 */
 
-Module.onRuntimeInitialized = () => {
-    console.log('Runtime initialized, initializing variables..')
+function onModuleInitialize(module) {
+    console.log('Runtime initialized')
 
+    /**
+     * int EMSCRIPTEN_ITM_P2P_TLS_Ex_str(double h_tx__meter, double h_rx__meter, double *pfl[], int climate, double N_0, double f__mhz,
+     *   int pol, double epsilon, double sigma, int mdvar, double time, double location, double situation,
+     *   double *A__db, long *warnings, IntermediateValues *interValues);
+     */
+    const EMSCRIPTEN_ITM_P2P_TLS_Ex_str = module.cwrap('EMSCRIPTEN_ITM_P2P_TLS_Ex_str', 'string', [
+        'number', // double h_tx__meter
+        'number', // double h_rx__meter
+        'number', // double *pfl[]
+        'number', // int climate
+        'number', // double N_0
+        'number', // double f__mhz
+        'number', // int pol
+        'number', // double epsilon
+        'number', // double sigma
+        'number', // int mdvar
+        'number', // double time
+        'number', // double location
+        'number', // double situation
+        'number', // double *A__db
+        'number', // long *warnings
+        'number'  // IntermediateValues *interValues
+    ])
+    console.log('Wrapper for EMSCRIPTEN_ITM_P2P_TLS_Ex_str created.')
+
+
+    console.log('Initializing variables')
     // https://stackoverflow.com/questions/71681491/passing-arrays-and-objects-from-javascript-to-c-in-web-assembly
     const rawPfl = [142,25.6,1692,1692,1693,1693,1693,1693,1693,1693,1694,1694,1694,1694,1694,1694,1694,1694,1694,1695,1695,1695,1695,1695,1695,1695,1695,1696,1696,1696,1696,1696,1696,1697,1697,1697,1697,1697,1697,1697,1697,1697,1697,1698,1698,1698,1698,1698,1698,1698,1698,1698,1698,1699,1699,1699,1699,1699,1699,1700,1700,1700,1700,1700,1700,1700,1701,1701,1701,1701,1701,1701,1702,1702,1702,1702,1702,1702,1702,1702,1703,1703,1703,1703,1703,1703,1703,1703,1703,1704,1704,1704,1704,1704,1704,1704,1704,1705,1705,1705,1705,1705,1705,1705,1705,1705,1705,1706,1706,1706,1706,1706,1706,1706,1706,1706,1707,1707,1707,1707,1707,1707,1707,1708,1708,1708,1708,1708,1708,1708,1708,1709,1709,1709,1709,1709,1710,1710,1710,1710,1710,1710,1710,1710,1709]
     const typedPfl = new Float64Array(rawPfl)
-    const ptr_pfl = Module._malloc(typedPfl.length * typedPfl.BYTES_PER_ELEMENT)
+    const ptr_pfl = module._malloc(typedPfl.length * typedPfl.BYTES_PER_ELEMENT)
     // https://github.com/emscripten-core/emscripten/blob/2e48b2debd5e984cde2cee563f4a359a9d688c46/src/preamble.js#L268-L281
-    Module.HEAPF64.set(typedPfl, ptr_pfl / 8);
+    module.HEAPF64.set(typedPfl, ptr_pfl / 8);
 
-    const ptr_A__db = Module._malloc(8) // double
-    const ptr_warnings = Module._malloc(8) // long
+    const ptr_A__db = module._malloc(8) // double
+    const ptr_warnings = module._malloc(8) // long
     // struct
     const intermediate_values_length =
         8 * 2 // double theta_hzn[2]
@@ -78,7 +81,7 @@ Module.onRuntimeInitialized = () => {
         + 8 // double A_fs__db
         + 8 // double d__km
         + 4 // int mode
-    const ptr_intermediate_values = Module._malloc(intermediate_values_length)
+    const ptr_intermediate_values = module._malloc(intermediate_values_length)
 
 
     console.log('Variables initialized, calling EMSCRIPTEN_ITM_P2P_TLS_Ex_str..')
@@ -108,8 +111,8 @@ Module.onRuntimeInitialized = () => {
     }
     console.log('Results:', results)
 
-    Module._free(ptr_pfl)
-    Module._free(ptr_A__db)
-    Module._free(ptr_warnings)
-    Module._free(ptr_intermediate_values)
+    module._free(ptr_pfl)
+    module._free(ptr_A__db)
+    module._free(ptr_warnings)
+    module._free(ptr_intermediate_values)
 }
