@@ -1,3 +1,4 @@
+import * as Module from "./em_bin/itm.js"
 
 
 const returnCodes = new Map([
@@ -51,10 +52,14 @@ let ITM_P2P_CR_Ex_func
 let onItmInitializeFunc
 
 
-window.onItmInitialize = function (callback) {
+Module().then(onEmscriptenRuntimeInitialize)
+
+
+export function onItmInitialize(callback) {
     onItmInitializeFunc = callback
     if (em_runtime) callback()
 }
+
 
 // Size needed to allocate to struct IntermediateValues
 const intermediate_values_length =
@@ -69,8 +74,8 @@ const intermediate_values_length =
     + 4 // int mode
 
 // Might need to change to Module all runtime references
-Module.onRuntimeInitialized = () => {
-    em_runtime = Module
+function onEmscriptenRuntimeInitialize(module) {
+    em_runtime = module
 
     // Prepare wrappers for the C functions.
     ITM_P2P_TLS_Ex_func = em_runtime.cwrap('EMSCRIPTEN_ITM_P2P_TLS_Ex_str', 'string', [
@@ -108,13 +113,12 @@ Module.onRuntimeInitialized = () => {
         'number', // long *warnings
         'number'  // IntermediateValues *interValues
     ])
-    // TODO: Area functions
 
     if (onItmInitializeFunc) onItmInitializeFunc()
 }
 
 
-window.ITM_P2P_TLS_Ex = function ITM_P2P_TLS_Ex(
+export function ITM_P2P_TLS_Ex(
     h_tx__meter, h_rx__meter, pfl, climate, N_0, f__mhz, pol,
     epsilon, sigma, mdvar, time, location, situation
 ) {
@@ -152,7 +156,7 @@ window.ITM_P2P_TLS_Ex = function ITM_P2P_TLS_Ex(
     return results
 }
 
-window.ITM_P2P_CR_Ex = function ITM_P2P_CR_Ex(
+export function ITM_P2P_CR_Ex(
     h_tx__meter, h_rx__meter, pfl, climate, N_0, f__mhz, pol,
     epsilon, sigma, mdvar, confidence, reliability
 ) {
@@ -212,16 +216,16 @@ function p2p_free(ptr_pfl, ptr_A__db, ptr_warnings, ptr_intermediate_values) {
 }
 
 
-function resolveReturnCode(code) {
+export function resolveReturnCode(code) {
     return returnCodes.get(code)
 }
-window.resolveReturnCode = resolveReturnCode
 
-function resolveWarnings(warnings) {
+export function resolveWarnings(warnings) {
     const arr = []
     for (let i = warnings.length - 1, j = 0; i >= 0; --i, ++j)
         if (warnings[i] == '1') arr.push(warningBits.get(j))
     if (arr.length == 0) arr.push('No warning flags')
     return arr
 }
-window.resolveWarnings = resolveWarnings
+
+// TODO: Change to commonjs and modularize if environment is correct.
