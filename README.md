@@ -1,7 +1,7 @@
 # Notes by Joni Rapo 2024 #
 My aim is to compile the ITM project into WebAssemply using Emscripten.
 
-For better UNIX support converted backslashes in includes to regular slashes using this: https://unix.stackexchange.com/questions/419842/replacing-backslashes-with-forward-slash-within-double-quotes .
+For better UNIX support converted backslashes in includes to regular slashes using this: https://unix.stackexchange.com/questions/419842/replacing-backslashes-with-forward-slash-within-double-quotes . Though apparently this might get patched in a future PR in the NTIA/itm repository.
 
 
 ## Emscripten Compilation ##
