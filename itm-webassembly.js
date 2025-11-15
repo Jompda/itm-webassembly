@@ -257,7 +257,6 @@ export function ITM_AREA_TLS_Ex(
 ) {
     if (!em_runtime) throw "Emscripten runtime not initialzed yet!"
 
-    const ptr_pfl = pfl_allocate(pfl)
     const { ptr_A__db, ptr_warnings, ptr_intermediate_values } = common_allocate()
 
     // A string containing key:value pairs separated by |
@@ -288,7 +287,6 @@ export function ITM_AREA_TLS_Ex(
         results.set(parts[0], parts[1])
     }
 
-    pfl_free(ptr_pfl)
     common_free(ptr_A__db, ptr_warnings, ptr_intermediate_values)
 
     return results
@@ -302,7 +300,6 @@ export function ITM_AREA_CR_Ex(
 ) {
     if (!em_runtime) throw "Emscripten runtime not initialzed yet!"
 
-    const ptr_pfl = pfl_allocate(pfl)
     const { ptr_A__db, ptr_warnings, ptr_intermediate_values } = common_allocate()
 
     // A string containing key:value pairs separated by |
@@ -332,7 +329,6 @@ export function ITM_AREA_CR_Ex(
         results.set(parts[0], parts[1])
     }
 
-    pfl_free(ptr_pfl)
     common_free(ptr_A__db, ptr_warnings, ptr_intermediate_values)
 
     return results
