@@ -27,29 +27,35 @@ const returnCodes = new Map([
     [1021, 'Internally computed surface refractivity value is too small'],
     [1022, 'Internally computed surface refractivity value is too large'],
 ])
-const warningBits = new Map([
-    [0, 'TX terminal height is near its limits'],
-    [1, 'RX terminal height is near its limits'],
-    [2, 'Frequency is near its limits'],
-    [3, 'Path distance is near its upper limit'],
-    [4, 'Path distance is large - care must be taken with result'],
-    [5, 'Path distance is near its lower limit'],
-    [6, 'Path distance is small - care must be taken with result'],
-    [7, 'TX horizon angle is large - small angle approximations could break down'],
-    [8, 'RX horizon angle is large - small angle approximations could break down'],
-    [9, 'TX horizon distance is less than 1/10 of the smooth earth horizon distance'],
-    [10, 'RX horizon distance is less than 1/10 of the smooth earth horizon distance'],
-    [11, 'TX horizon distance is greater than 3 times the smooth earth horizon distance'],
-    [12, 'RX horizon distance is greater than 3 times the smooth earth horizon distance'],
-    [13, 'One of the provided variabilities is located far in the tail of its distribution'],
-    [14, 'Internally computed surface refractivity value is small - care must be taken with result'],
-])
+const warningBits = [
+    'TX terminal height is near its limits',
+    'RX terminal height is near its limits',
+    'Frequency is near its limits',
+    'Path distance is near its upper limit',
+    'Path distance is large - care must be taken with result',
+    'Path distance is near its lower limit',
+    'Path distance is small - care must be taken with result',
+    'TX horizon angle is large - small angle approximations could break down',
+    'RX horizon angle is large - small angle approximations could break down',
+    'TX horizon distance is less than 1/10 of the smooth earth horizon distance',
+    'RX horizon distance is less than 1/10 of the smooth earth horizon distance',
+    'TX horizon distance is greater than 3 times the smooth earth horizon distance',
+    'RX horizon distance is greater than 3 times the smooth earth horizon distance',
+    'One of the provided variabilities is located far in the tail of its distribution',
+    'Internally computed surface refractivity value is small - care must be taken with result',
+]
 
 
 let em_runtime
 let ITM_P2P_TLS_Ex_func
 let ITM_P2P_CR_Ex_func
+let ITM_AREA_TLS_Ex_func
+let ITM_AREA_CR_Ex_func
+let ComputeDeltaH_func
 let onItmInitializeFunc
+
+
+// TODO: reuse memory allocation
 
 
 Module().then(onEmscriptenRuntimeInitialize)
@@ -113,6 +119,52 @@ function onEmscriptenRuntimeInitialize(module) {
         'number', // long *warnings
         'number'  // IntermediateValues *interValues
     ])
+    ITM_AREA_TLS_Ex_func = em_runtime.cwrap('EMSCRIPTEN_ITM_AREA_TLS_Ex_str', 'string', [
+        'number', // double h_tx__meter
+        'number', // double h_rx__meter
+        'number', // int tx_site_criteria
+        'number', // int rx_site_criteria
+        'number', // double d__km
+        'number', // double delta_h__meter
+        'number', // int climate
+        'number', // double N_0
+        'number', // double f__mhz
+        'number', // int pol
+        'number', // double epsilon
+        'number', // double sigma
+        'number', // int mdvar
+        'number', // double time
+        'number', // double location
+        'number', // double situation
+        'number', // double *A__db
+        'number', // long *warnings
+        'number'  // IntermediateValues *interValues
+    ])
+    ITM_AREA_CR_Ex_func = em_runtime.cwrap('EMSCRIPTEN_ITM_AREA_CR_Ex_str', 'string', [
+        'number', // double h_tx__meter
+        'number', // double h_rx__meter
+        'number', // int tx_site_criteria
+        'number', // int rx_site_criteria
+        'number', // double d__km
+        'number', // double delta_h__meter
+        'number', // int climate
+        'number', // double N_0
+        'number', // double f__mhz
+        'number', // int pol
+        'number', // double epsilon
+        'number', // double sigma
+        'number', // int mdvar
+        'number', // double confidence
+        'number', // double reliability
+        'number', // double *A__db
+        'number', // long *warnings
+        'number'  // IntermediateValues *interValues
+    ])
+    ComputeDeltaH_func = em_runtime.cwrap('ComputeDeltaH', 'double', [
+        'number', // double *pfl[]
+        'number', // double d_start__meter
+        'number', // double d_end__meter
+    ])
 
     if (onItmInitializeFunc) onItmInitializeFunc()
 }
@@ -124,26 +176,27 @@ export function ITM_P2P_TLS_Ex(
 ) {
     if (!em_runtime) throw "Emscripten runtime not initialzed yet!"
 
-    const { ptr_pfl, ptr_A__db, ptr_warnings, ptr_intermediate_values } = p2p_allocate(pfl)
+    const ptr_pfl = pfl_allocate(pfl)
+    const { ptr_A__db, ptr_warnings, ptr_intermediate_values } = common_allocate()
 
     // A string containing key:value pairs separated by |
     const resultStr = ITM_P2P_TLS_Ex_func(
-        h_tx__meter, // double h_tx__meter
-        h_rx__meter, // double h_rx__meter
-        ptr_pfl, // double pfl[]
-        climate, // int climate
-        N_0, // double N_0
-        f__mhz, // double f__mhz
-        pol, // int pol
-        epsilon, // double epsilon
-        sigma, // double sigma
-        mdvar, // int mdvar
-        time, // double time
-        location, // double location
-        situation, // double situation
-        ptr_A__db, // double *A__db
-        ptr_warnings, // long *warnings
-        ptr_intermediate_values // IntermediateValues *interValues
+        h_tx__meter, // double
+        h_rx__meter, // double
+        ptr_pfl, // double
+        climate, // int
+        N_0, // double
+        f__mhz, // double
+        pol, // int
+        epsilon, // double
+        sigma, // double
+        mdvar, // int
+        time, // double
+        location, // double
+        situation, // double
+        ptr_A__db, // double
+        ptr_warnings, // long
+        ptr_intermediate_values // IntermediateValues
     )
     const results = new Map()
     for (const pair of resultStr.split('|')) {
@@ -151,7 +204,8 @@ export function ITM_P2P_TLS_Ex(
         results.set(parts[0], parts[1])
     }
 
-    p2p_free(ptr_pfl, ptr_A__db, ptr_warnings, ptr_intermediate_values)
+    pfl_free(ptr_pfl)
+    common_free(ptr_A__db, ptr_warnings, ptr_intermediate_values)
 
     return results
 }
@@ -162,25 +216,26 @@ export function ITM_P2P_CR_Ex(
 ) {
     if (!em_runtime) throw "Emscripten runtime not initialzed yet!"
 
-    const { ptr_pfl, ptr_A__db, ptr_warnings, ptr_intermediate_values } = p2p_allocate(pfl)
+    const ptr_pfl = pfl_allocate(pfl)
+    const { ptr_A__db, ptr_warnings, ptr_intermediate_values } = common_allocate()
 
     // A string containing key:value pairs separated by |
     const resultStr = ITM_P2P_CR_Ex_func(
-        h_tx__meter, // double h_tx__meter
-        h_rx__meter, // double h_rx__meter
-        ptr_pfl, // double pfl[]
-        climate, // int climate
-        N_0, // double N_0
-        f__mhz, // double f__mhz
-        pol, // int pol
-        epsilon, // double epsilon
-        sigma, // double sigma
-        mdvar, // int mdvar
-        confidence, // double confidence
-        reliability, // double reliability
-        ptr_A__db, // double *A__db
-        ptr_warnings, // long *warnings
-        ptr_intermediate_values // IntermediateValues *interValues
+        h_tx__meter, // double
+        h_rx__meter, // double
+        ptr_pfl, // double
+        climate, // int
+        N_0, // double
+        f__mhz, // double
+        pol, // int
+        epsilon, // double
+        sigma, // double
+        mdvar, // int
+        confidence, // double
+        reliability, // double
+        ptr_A__db, // double
+        ptr_warnings, // long
+        ptr_intermediate_values // IntermediateValues
     )
     const results = new Map()
     for (const pair of resultStr.split('|')) {
@@ -188,28 +243,132 @@ export function ITM_P2P_CR_Ex(
         results.set(parts[0], parts[1])
     }
 
-    p2p_free(ptr_pfl, ptr_A__db, ptr_warnings, ptr_intermediate_values)
+    pfl_free(ptr_pfl)
+    common_free(ptr_A__db, ptr_warnings, ptr_intermediate_values)
 
     return results
 }
 
 
-function p2p_allocate(pfl) {
-    const typedPfl = new Float64Array(pfl)
-    const ptr_pfl = em_runtime._malloc(typedPfl.length * typedPfl.BYTES_PER_ELEMENT)
-    em_runtime.HEAPF64.set(typedPfl, ptr_pfl / 8);
-    
-    const ptr_A__db = em_runtime._malloc(8) // double
-    const ptr_warnings = em_runtime._malloc(8) // long
+export function ITM_AREA_TLS_Ex(
+    h_tx__meter, h_rx__meter, tx_site_criteria, rx_site_criteria, d__km, delta_h__meter,
+    climate, N_0, f__mhz, pol, epsilon, sigma, mdvar,
+    time, location, situation
+) {
+    if (!em_runtime) throw "Emscripten runtime not initialzed yet!"
 
-    const ptr_intermediate_values = em_runtime._malloc(intermediate_values_length)
-    return {
-        ptr_pfl, ptr_A__db, ptr_warnings, ptr_intermediate_values
+    const ptr_pfl = pfl_allocate(pfl)
+    const { ptr_A__db, ptr_warnings, ptr_intermediate_values } = common_allocate()
+
+    // A string containing key:value pairs separated by |
+    const resultStr = ITM_AREA_TLS_Ex_func(
+        h_tx__meter, // double
+        h_rx__meter, // double
+        tx_site_criteria, // int 
+        rx_site_criteria, // int 
+        d__km, // double 
+        delta_h__meter, // double 
+        climate, // int
+        N_0, // double
+        f__mhz, // double
+        pol, // int
+        epsilon, // double
+        sigma, // double
+        mdvar, // int
+        time, // double
+        location, // double
+        situation, // double
+        ptr_A__db, // double
+        ptr_warnings, // long
+        ptr_intermediate_values // IntermediateValues
+    )
+    const results = new Map()
+    for (const pair of resultStr.split('|')) {
+        const parts = pair.split(':')
+        results.set(parts[0], parts[1])
     }
+
+    pfl_free(ptr_pfl)
+    common_free(ptr_A__db, ptr_warnings, ptr_intermediate_values)
+
+    return results
 }
 
-function p2p_free(ptr_pfl, ptr_A__db, ptr_warnings, ptr_intermediate_values) {
+
+export function ITM_AREA_CR_Ex(
+    h_tx__meter, h_rx__meter, tx_site_criteria, rx_site_criteria, d__km, delta_h__meter,
+    climate, N_0, f__mhz, pol, epsilon, sigma, mdvar,
+    confidence, reliability
+) {
+    if (!em_runtime) throw "Emscripten runtime not initialzed yet!"
+
+    const ptr_pfl = pfl_allocate(pfl)
+    const { ptr_A__db, ptr_warnings, ptr_intermediate_values } = common_allocate()
+
+    // A string containing key:value pairs separated by |
+    const resultStr = ITM_AREA_CR_Ex_func(
+        h_tx__meter, // double
+        h_rx__meter, // double
+        tx_site_criteria, // int 
+        rx_site_criteria, // int 
+        d__km, // double 
+        delta_h__meter, // double 
+        climate, // int
+        N_0, // double
+        f__mhz, // double
+        pol, // int
+        epsilon, // double
+        sigma, // double
+        mdvar, // int
+        confidence, // double
+        reliability, // double
+        ptr_A__db, // double
+        ptr_warnings, // long
+        ptr_intermediate_values // IntermediateValues
+    )
+    const results = new Map()
+    for (const pair of resultStr.split('|')) {
+        const parts = pair.split(':')
+        results.set(parts[0], parts[1])
+    }
+
+    pfl_free(ptr_pfl)
+    common_free(ptr_A__db, ptr_warnings, ptr_intermediate_values)
+
+    return results
+}
+
+
+export function ComputeDeltaH(pfl, d_start__meter, d_end__meter) {
+    if (!em_runtime) throw "Emscripten runtime not initialzed yet!"
+    const ptr_pfl = pfl_allocate(pfl)
+    const delta_h__meter = ComputeDeltaH_func(ptr_pfl, d_start__meter, d_end__meter)
+    pfl_free(ptr_pfl)
+    return delta_h__meter
+}
+
+
+function pfl_allocate(pfl) {
+    const typedPfl = new Float64Array(pfl)
+    const ptr_pfl = em_runtime._malloc(typedPfl.length * typedPfl.BYTES_PER_ELEMENT)
+    em_runtime.HEAPF64.set(typedPfl, ptr_pfl / 8)
+    return ptr_pfl
+}
+
+
+function pfl_free(ptr_pfl) {
     em_runtime._free(ptr_pfl)
+}
+
+
+function common_allocate() {
+    const ptr_A__db = em_runtime._malloc(8) // double
+    const ptr_warnings = em_runtime._malloc(8) // long
+    const ptr_intermediate_values = em_runtime._malloc(intermediate_values_length)
+    return { ptr_A__db, ptr_warnings, ptr_intermediate_values }
+}
+
+function common_free(ptr_A__db, ptr_warnings, ptr_intermediate_values) {
     em_runtime._free(ptr_A__db)
     em_runtime._free(ptr_warnings)
     em_runtime._free(ptr_intermediate_values)
@@ -220,10 +379,11 @@ export function resolveReturnCode(code) {
     return returnCodes.get(code)
 }
 
+
 export function resolveWarnings(warnings) {
     const arr = []
     for (let i = warnings.length - 1, j = 0; i >= 0; --i, ++j)
-        if (warnings[i] == '1') arr.push(warningBits.get(j))
+        if (warnings[i] == '1') arr.push(warningBits[j])
     if (arr.length == 0) arr.push('No warning flags')
     return arr
 }

@@ -24,7 +24,8 @@ md -Force .\em_bin\
 
 
 # browser / js
-em++ -fdeclspec -sMODULARIZE=1 -sEXPORTED_FUNCTIONS="['_malloc','_free','_EMSCRIPTEN_ITM_P2P_TLS_Ex_str']" -sEXPORTED_RUNTIME_METHODS='cwrap,ccall,setValue,getValue,HEAPF64' -sENVIRONMENT=web -o .\em_bin\.\itm.js $(ls .\src\*.cpp | % {$_.FullName})
+# NOTE: use backtick (`) or something to break into multiple lines, TODO: test on windows
+em++ -fdeclspec -sMODULARIZE=1 -sEXPORTED_FUNCTIONS="['_malloc','_free','_ComputeDeltaH','_EMSCRIPTEN_ITM_P2P_TLS_Ex_str','_EMSCRIPTEN_ITM_P2P_CR_Ex_str','_EMSCRIPTEN_ITM_AREA_TLS_Ex_str','_EMSCRIPTEN_ITM_AREA_CR_Ex_str']" -sEXPORTED_RUNTIME_METHODS='cwrap,ccall,setValue,getValue,HEAPF64' -sENVIRONMENT=web -o .\em_bin\.\itm.js $(ls .\src\*.cpp | % {$_.FullName})
 
 
 
