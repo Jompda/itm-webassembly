@@ -160,7 +160,7 @@ function onEmscriptenRuntimeInitialize(module) {
         'number', // long *warnings
         'number'  // IntermediateValues *interValues
     ])
-    ComputeDeltaH_func = em_runtime.cwrap('ComputeDeltaH', 'double', [
+    ComputeDeltaH_func = em_runtime.cwrap('ComputeDeltaH', 'number', [
         'number', // double *pfl[]
         'number', // double d_start__meter
         'number', // double d_end__meter
